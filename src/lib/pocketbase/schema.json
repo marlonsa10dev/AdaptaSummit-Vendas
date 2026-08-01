@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-08-01T19:53:03.652Z",
+  "generatedAt": "2026-08-01T20:06:02.731Z",
   "collections": [
     {
       "name": "users",
       "type": "auth",
       "apiRules": {
-        "list": "id = @request.auth.id",
-        "view": "id = @request.auth.id",
-        "create": "",
-        "update": "id = @request.auth.id",
-        "delete": "id = @request.auth.id"
+        "list": "@request.auth.id != '' && (@request.auth.perfil = 'Administrador' || id = @request.auth.id)",
+        "view": "@request.auth.id != '' && (@request.auth.perfil = 'Administrador' || id = @request.auth.id)",
+        "create": "@request.auth.id != '' && @request.auth.perfil = 'Administrador'",
+        "update": "@request.auth.id != '' && (@request.auth.perfil = 'Administrador' || id = @request.auth.id)",
+        "delete": "@request.auth.id != '' && @request.auth.perfil = 'Administrador'"
       },
       "fields": [
         {
@@ -44,6 +44,12 @@
           "required": true,
           "system": false,
           "selectValues": ["Vendedor", "Gestor", "Diretoria", "Administrador"]
+        },
+        {
+          "name": "ativo",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -56,8 +62,8 @@
       "name": "clientes",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "@request.auth.id != '' && (vendedor = @request.auth.id || @request.auth.perfil = 'Gestor' || @request.auth.perfil = 'Diretoria' || @request.auth.perfil = 'Administrador')",
+        "view": "@request.auth.id != '' && (vendedor = @request.auth.id || @request.auth.perfil = 'Gestor' || @request.auth.perfil = 'Diretoria' || @request.auth.perfil = 'Administrador')",
         "create": "@request.auth.id != ''",
         "update": "@request.auth.id != ''",
         "delete": "@request.auth.id != '' && @request.auth.perfil = 'Administrador'"
@@ -101,11 +107,11 @@
       "name": "registros",
       "type": "base",
       "apiRules": {
-        "list": "responsavel = @request.auth.id",
-        "view": "responsavel = @request.auth.id",
+        "list": "@request.auth.id != '' && (responsavel = @request.auth.id || @request.auth.perfil = 'Gestor' || @request.auth.perfil = 'Diretoria' || @request.auth.perfil = 'Administrador')",
+        "view": "@request.auth.id != '' && (responsavel = @request.auth.id || @request.auth.perfil = 'Gestor' || @request.auth.perfil = 'Diretoria' || @request.auth.perfil = 'Administrador')",
         "create": "@request.auth.id != ''",
-        "update": "responsavel = @request.auth.id",
-        "delete": "responsavel = @request.auth.id"
+        "update": "@request.auth.id != '' && (responsavel = @request.auth.id || @request.auth.perfil = 'Gestor' || @request.auth.perfil = 'Diretoria' || @request.auth.perfil = 'Administrador')",
+        "delete": "@request.auth.id != '' && (responsavel = @request.auth.id || @request.auth.perfil = 'Administrador')"
       },
       "fields": [
         {
@@ -194,6 +200,70 @@
         "CREATE INDEX idx_registros_cliente ON registros (cliente)",
         "CREATE INDEX idx_registros_responsavel ON registros (responsavel)",
         "CREATE INDEX idx_registros_created ON registros (created DESC)"
+      ]
+    },
+    {
+      "name": "auditoria",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && @request.auth.perfil = 'Administrador'",
+        "view": "@request.auth.id != '' && @request.auth.perfil = 'Administrador'",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "usuario",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "acao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "entidade",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "entidadeId",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "detalhes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_auditoria_usuario ON auditoria (usuario)",
+        "CREATE INDEX idx_auditoria_acao ON auditoria (acao)",
+        "CREATE INDEX idx_auditoria_entidade ON auditoria (entidade)",
+        "CREATE INDEX idx_auditoria_created ON auditoria (created DESC)"
       ]
     }
   ]

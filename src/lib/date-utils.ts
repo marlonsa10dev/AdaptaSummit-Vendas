@@ -30,3 +30,11 @@ export function isValidDate(dateStr: string): boolean {
   const date = new Date(y, m - 1, d)
   return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d
 }
+
+export function formatBRDateTime(dateStr: string): string {
+  if (!dateStr) return ''
+  const datePart = formatBR(dateStr)
+  const timePart =
+    dateStr.split(' ')[1]?.substring(0, 5) || dateStr.split('T')[1]?.substring(0, 5) || ''
+  return timePart ? `${datePart} ${timePart}` : datePart
+}

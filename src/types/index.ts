@@ -6,8 +6,23 @@ export interface User {
   name: string
   perfil: UserPerfil
   avatar?: string
+  ativo?: boolean
   created: string
   updated: string
+}
+
+export interface Auditoria {
+  id: string
+  usuario: string
+  acao: string
+  entidade: string
+  entidadeId: string
+  detalhes: string
+  created: string
+  updated: string
+  expand?: {
+    usuario?: User
+  }
 }
 
 export interface Cliente {

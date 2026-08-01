@@ -17,6 +17,7 @@ routerAdd(
           name: u.getString('name'),
           email: u.getString('email'),
           perfil: u.getString('perfil'),
+          ativo: u.getBool('ativo'),
           created: u.getString('created'),
           updated: u.getString('updated'),
         }
@@ -83,7 +84,14 @@ routerAdd(
     const usersList = Object.values(usersMap)
     const clientesList = Object.values(clientesMap)
 
-    return e.json(200, { registros: registrosData, users: usersList, clientes: clientesList })
+    let filteredUsers = usersList
+    if (!isManager) {
+      filteredUsers = usersList.filter(function (u) {
+        return u.id === auth.id
+      })
+    }
+
+    return e.json(200, { registros: registrosData, users: filteredUsers, clientes: clientesList })
   },
   $apis.requireAuth(),
 )
