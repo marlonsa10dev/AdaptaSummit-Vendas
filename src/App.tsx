@@ -13,6 +13,7 @@ import VisaoVendedor from '@/pages/VisaoVendedor'
 import VisaoGestao from '@/pages/VisaoGestao'
 import GestaoUsuarios from '@/pages/GestaoUsuarios'
 import Auditoria from '@/pages/Auditoria'
+import Ajuda from '@/pages/Ajuda'
 import NotFound from '@/pages/NotFound'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/ficha-cliente/:clienteId" element={<FichaCliente />} />
             <Route path="/visao-vendedor" element={<VisaoVendedor />} />
             <Route path="/visao-gestao" element={<VisaoGestao />} />
+            <Route path="/ajuda" element={<Ajuda />} />
             <Route
               path="/gestao-usuarios"
               element={

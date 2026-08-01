@@ -10,7 +10,7 @@ onRecordUpdateRequest((e) => {
     const newStatus = e.record.getString('status')
     const newDataProximaAcao = e.record.getString('dataProximaAcao')
     let acao = 'editou'
-    if (newStatus === 'Concluida' && originalStatus !== 'Concluida') {
+    if (newStatus === 'Concluída' && originalStatus !== 'Concluída') {
       acao = 'concluiu'
     } else if (newDataProximaAcao !== originalDataProximaAcao) {
       acao = 'reagendou'

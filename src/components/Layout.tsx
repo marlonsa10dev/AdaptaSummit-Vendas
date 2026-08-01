@@ -12,6 +12,7 @@ import {
   PieChart,
   ShieldCheck,
   History,
+  HelpCircle,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -42,6 +43,7 @@ export function Layout() {
     { label: 'Registros', path: '/registros', icon: ClipboardList },
     { label: 'Visão por Vendedor', path: '/visao-vendedor', icon: BarChart3 },
     ...(isManager ? [{ label: 'Visão de Gestão', path: '/visao-gestao', icon: PieChart }] : []),
+    { label: 'Ajuda', path: '/ajuda', icon: HelpCircle },
   ]
 
   const adminItems = [
