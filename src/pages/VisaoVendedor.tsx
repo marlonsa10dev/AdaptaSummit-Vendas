@@ -26,6 +26,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { getDatePart } from '@/lib/pendencia'
+import { formatBR } from '@/lib/date-utils'
 import type { Registro } from '@/types'
 
 export default function VisaoVendedor() {
@@ -79,7 +80,7 @@ export default function VisaoVendedor() {
         { key: 'status', label: 'Status' },
       ],
       sellerRegistros.map((r) => ({
-        data: getDatePart(r.data),
+        data: formatBR(r.data),
         tipo: r.tipo,
         cliente: r.expand?.cliente?.nome || '',
         descricao: r.descricao,

@@ -18,6 +18,8 @@ import {
   reagendarPendencia,
 } from '@/services/registros'
 import { getPendenciaStatus, hasPendencia } from '@/lib/pendencia'
+import { formatBR } from '@/lib/date-utils'
+import { DateInput } from '@/components/DateInput'
 import { RescheduleDialog } from '@/components/RescheduleDialog'
 import { getClientes } from '@/services/clientes'
 import { RegistroForm } from '@/components/RegistroForm'
@@ -237,16 +239,16 @@ export default function Registros() {
                 <SelectItem value="Ação para semana seguinte">Ação para semana seguinte</SelectItem>
               </SelectContent>
             </Select>
-            <Input
-              type="date"
+            <DateInput
               value={dataInicial}
-              onChange={(e) => setDataInicial(e.target.value)}
+              onChange={(v) => setDataInicial(v)}
+              placeholder="dd/mm/aaaa"
               className="h-9 text-xs bg-slate-50/50"
             />
-            <Input
-              type="date"
+            <DateInput
               value={dataFinal}
-              onChange={(e) => setDataFinal(e.target.value)}
+              onChange={(v) => setDataFinal(v)}
+              placeholder="dd/mm/aaaa"
               className="h-9 text-xs bg-slate-50/50"
             />
           </div>
@@ -301,9 +303,7 @@ export default function Registros() {
                         )}
                       </div>
                       <span className="text-xs text-slate-400 whitespace-nowrap">
-                        {new Date(getDatePart(registro.data) + 'T00:00:00').toLocaleDateString(
-                          'pt-BR',
-                        )}
+                        {formatBR(registro.data)}
                       </span>
                     </div>
                     <p className="text-sm font-semibold text-slate-900 mb-1">
@@ -317,10 +317,7 @@ export default function Registros() {
                           <p className="text-xs text-slate-700">{registro.proximaAcao}</p>
                           {registro.dataProximaAcao && (
                             <p className="text-[11px] text-slate-400 mt-0.5">
-                              Previsão:{' '}
-                              {new Date(
-                                getDatePart(registro.dataProximaAcao) + 'T00:00:00',
-                              ).toLocaleDateString('pt-BR')}
+                              Previsão: {formatBR(registro.dataProximaAcao || '')}
                             </p>
                           )}
                         </div>

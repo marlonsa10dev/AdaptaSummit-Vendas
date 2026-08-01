@@ -5,6 +5,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart'
+import { formatBR } from '@/lib/date-utils'
 
 const chartConfig = {
   count: { label: 'Registros', color: 'hsl(221, 83%, 53%)' },
@@ -37,7 +38,13 @@ export function TrendChart({ data }: TrendChartProps) {
     <ChartContainer config={chartConfig} className="h-[220px] w-full">
       <LineChart data={data}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
-        <XAxis dataKey="week" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
+        <XAxis
+          dataKey="week"
+          tickLine={false}
+          axisLine={false}
+          tick={{ fontSize: 10 }}
+          tickFormatter={(v: string) => formatBR(v)}
+        />
         <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} allowDecimals={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Line dataKey="count" stroke="hsl(221, 83%, 53%)" strokeWidth={2} dot={{ r: 3 }} />

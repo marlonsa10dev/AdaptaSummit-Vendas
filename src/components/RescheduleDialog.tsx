@@ -7,8 +7,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { DateInput } from '@/components/DateInput'
 
 interface RescheduleDialogProps {
   open: boolean
@@ -43,11 +43,10 @@ export function RescheduleDialog({
           <Label htmlFor="reschedule-date" className="text-xs font-semibold text-slate-700">
             Nova data prevista
           </Label>
-          <Input
+          <DateInput
             id="reschedule-date"
-            type="date"
             value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
+            onChange={setNewDate}
             className="bg-slate-50/50 focus:bg-white"
           />
         </div>

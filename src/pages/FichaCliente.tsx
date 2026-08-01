@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { formatBR } from '@/lib/date-utils'
 
 const tipoMeta: Record<string, { icon: typeof TrendingUp; color: string; bg: string }> = {
   Highlight: {
@@ -68,7 +69,7 @@ export default function FichaCliente() {
         { key: 'status', label: 'Status' },
       ],
       registros.map((r) => ({
-        data: getDatePart(r.data),
+        data: formatBR(r.data),
         tipo: r.tipo,
         descricao: r.descricao,
         responsavel: r.expand?.responsavel?.name || '',
@@ -165,9 +166,7 @@ export default function FichaCliente() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="text-sm font-semibold text-slate-900">{r.tipo}</span>
-                        <span className="text-xs text-slate-400">
-                          {new Date(getDatePart(r.data) + 'T00:00:00').toLocaleDateString('pt-BR')}
-                        </span>
+                        <span className="text-xs text-slate-400">{formatBR(r.data)}</span>
                       </div>
                       <p className="text-sm text-slate-600 mb-1">{r.descricao}</p>
                       <div className="flex items-center gap-2 text-[11px] text-slate-400">

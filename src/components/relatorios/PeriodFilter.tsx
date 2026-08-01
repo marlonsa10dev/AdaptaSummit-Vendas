@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { DateInput } from '@/components/DateInput'
 
 interface PeriodFilterProps {
   startDate: string
@@ -34,19 +34,19 @@ export function PeriodFilter({
     <div className="flex flex-wrap items-end gap-3">
       <div className="space-y-1">
         <Label className="text-xs font-semibold text-slate-700">Data inicial</Label>
-        <Input
-          type="date"
+        <DateInput
           value={startDate}
-          onChange={(e) => onStartDateChange(e.target.value)}
+          onChange={onStartDateChange}
+          placeholder="dd/mm/aaaa"
           className="h-9 w-40 text-xs bg-slate-50/50"
         />
       </div>
       <div className="space-y-1">
         <Label className="text-xs font-semibold text-slate-700">Data final</Label>
-        <Input
-          type="date"
+        <DateInput
           value={endDate}
-          onChange={(e) => onEndDateChange(e.target.value)}
+          onChange={onEndDateChange}
+          placeholder="dd/mm/aaaa"
           className="h-9 w-40 text-xs bg-slate-50/50"
         />
       </div>

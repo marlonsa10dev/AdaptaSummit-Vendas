@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DateInput } from '@/components/DateInput'
 import type { Cliente, Registro } from '@/types'
 
 function normalizeName(str: string): string {
@@ -263,13 +264,12 @@ export function RegistroForm({
               <Label className="text-xs font-semibold text-slate-700">
                 Data <span className="text-rose-500">*</span>
               </Label>
-              <Input
-                type="date"
+              <DateInput
                 value={data}
                 min={minDateStr}
                 max={todayStr}
-                onChange={(e) => {
-                  setData(e.target.value)
+                onChange={(v) => {
+                  setData(v)
                   setErrors((prev) => ({ ...prev, data: '' }))
                 }}
                 className="bg-slate-50/50 focus:bg-white"
@@ -374,11 +374,10 @@ export function RegistroForm({
                 <Label className="text-xs font-semibold text-slate-700">
                   Data prevista <span className="text-rose-500">*</span>
                 </Label>
-                <Input
-                  type="date"
+                <DateInput
                   value={dataProximaAcao}
-                  onChange={(e) => {
-                    setDataProximaAcao(e.target.value)
+                  onChange={(v) => {
+                    setDataProximaAcao(v)
                     setErrors((prev) => ({ ...prev, dataProximaAcao: '' }))
                   }}
                   className="bg-slate-50/50 focus:bg-white"

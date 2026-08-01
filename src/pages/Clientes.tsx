@@ -40,6 +40,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useToast } from '@/hooks/use-toast'
+import { formatBR } from '@/lib/date-utils'
 import type { Cliente, User } from '@/types'
 
 function normalizeName(str: string): string {
@@ -442,7 +443,7 @@ export default function Clientes() {
                           {cliente.expand?.vendedor?.name || 'Não informado'}
                         </td>
                         <td className="px-6 py-3.5 text-xs text-slate-500">
-                          {new Date(cliente.created).toLocaleDateString('pt-BR')}
+                          {formatBR(cliente.created)}
                         </td>
                         <td className="px-6 py-3.5 text-right space-x-1">
                           <Button
@@ -505,7 +506,7 @@ export default function Clientes() {
                     <div className="flex items-center justify-between">
                       <h3 className="font-bold text-slate-900 text-sm">{cliente.nome}</h3>
                       <span className="text-[11px] text-slate-400">
-                        {new Date(cliente.created).toLocaleDateString('pt-BR')}
+                        {formatBR(cliente.created)}
                       </span>
                     </div>
 

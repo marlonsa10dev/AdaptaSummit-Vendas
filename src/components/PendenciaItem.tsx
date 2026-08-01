@@ -1,6 +1,7 @@
 import { Check, CalendarClock, CalendarDays } from 'lucide-react'
 import type { Registro } from '@/types'
 import { getPendenciaStatus, getDatePart } from '@/lib/pendencia'
+import { formatBR } from '@/lib/date-utils'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -65,7 +66,7 @@ export function PendenciaItem({
         <p className="text-xs text-slate-600 mb-1.5">{registro.proximaAcao}</p>
         <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
           <CalendarDays className="h-3 w-3" />
-          <span>Prevista: {new Date(dataPrevista + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
+          <span>Prevista: {formatBR(dataPrevista)}</span>
         </div>
       </div>
       {!isConcluida && (
