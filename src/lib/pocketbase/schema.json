@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T19:14:18.747Z",
+  "generatedAt": "2026-08-01T19:25:58.414Z",
   "collections": [
     {
       "name": "users",
@@ -180,6 +180,12 @@
           "required": false,
           "system": false,
           "collectionRef": "users"
+        },
+        {
+          "name": "dataConclusao",
+          "type": "date",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

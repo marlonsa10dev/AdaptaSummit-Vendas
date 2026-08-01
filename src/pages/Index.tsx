@@ -8,13 +8,15 @@ import {
   ArrowRight,
   Building2,
   Calendar,
+  CalendarCheck,
   Plus,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
 import { getClientes } from '@/services/clientes'
 import { getUsers } from '@/services/users'
-import { getRegistrosNaSemana } from '@/services/registros'
+import { getRegistrosNaSemana, getPendencias } from '@/services/registros'
+import { groupPendencias } from '@/lib/pendencia'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Cliente } from '@/types'
@@ -26,18 +28,24 @@ export default function Index() {
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [usersCount, setUsersCount] = useState<number>(0)
   const [registrosSemanaCount, setRegistrosSemanaCount] = useState<number>(0)
+  const [pendenciasAtrasadas, setPendenciasAtrasadas] = useState<number>(0)
+  const [pendenciasHoje, setPendenciasHoje] = useState<number>(0)
   const [loading, setLoading] = useState<boolean>(true)
 
   const loadData = useCallback(async () => {
     try {
-      const [clientesData, usersData, registrosData] = await Promise.all([
+      const [clientesData, usersData, registrosData, pendenciasData] = await Promise.all([
         getClientes(),
         getUsers(),
         getRegistrosNaSemana().catch(() => []),
+        getPendencias().catch(() => []),
       ])
       setClientes(clientesData)
       setUsersCount(usersData.length)
       setRegistrosSemanaCount(registrosData.length)
+      const groups = groupPendencias(pendenciasData)
+      setPendenciasAtrasadas(groups.atrasadas.length)
+      setPendenciasHoje(groups.hoje.length)
     } catch (err) {
       console.error('Erro ao carregar dados do dashboard:', err)
     } finally {
@@ -147,6 +155,36 @@ export default function Index() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Minha Semana Banner */}
+      {(pendenciasAtrasadas > 0 || pendenciasHoje > 0) && (
+        <Link to="/minha-semana" className="block animate-fade-in">
+          <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-sm hover:shadow-md transition-all">
+            <CardContent className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-white">
+                  <CalendarCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Minha Semana</p>
+                  <p className="text-xs text-slate-600">
+                    {pendenciasAtrasadas > 0 && (
+                      <span className="text-rose-600 font-medium">
+                        {pendenciasAtrasadas} atrasada(s)
+                      </span>
+                    )}
+                    {pendenciasAtrasadas > 0 && pendenciasHoje > 0 && ' · '}
+                    {pendenciasHoje > 0 && (
+                      <span className="text-amber-600 font-medium">{pendenciasHoje} para hoje</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 text-blue-600" />
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       {/* Clientes Recentes */}
       <Card className="border-slate-200 shadow-sm">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { X, Loader2, Building2, Plus } from 'lucide-react'
+import { getDatePart } from '@/lib/pendencia'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
 import { createRegistro, updateRegistro } from '@/services/registros'
@@ -32,10 +33,6 @@ function formatDate(date: Date): string {
   const m = String(date.getMonth() + 1).padStart(2, '0')
   const d = String(date.getDate()).padStart(2, '0')
   return `${y}-${m}-${d}`
-}
-
-function getDatePart(dateStr: string): string {
-  return dateStr?.split(' ')[0]?.split('T')[0] || ''
 }
 
 interface RegistroFormProps {
@@ -196,6 +193,12 @@ export function RegistroForm({
         payload.dataProximaAcao = ''
       }
       if (editingRegistro) {
+        const tipoChanged = tipo !== editingRegistro.tipo
+        const acaoChanged = proximaAcao.trim() !== (editingRegistro.proximaAcao || '').trim()
+        if (tipoChanged || acaoChanged) {
+          payload.status = 'Pendente'
+          payload.dataConclusao = ''
+        }
         await updateRegistro(editingRegistro.id, payload)
         toast({ title: 'Sucesso', description: 'Registro atualizado com sucesso.' })
       } else {

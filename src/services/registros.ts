@@ -36,7 +36,33 @@ export const updateRegistro = (
     descricao: string
     proximaAcao?: string
     dataProximaAcao?: string
+    status?: string
+    dataConclusao?: string
   },
 ) => pb.collection('registros').update<Registro>(id, data, { expand: EXPAND })
 
 export const deleteRegistro = (id: string) => pb.collection('registros').delete(id)
+
+export const getPendencias = () =>
+  pb.collection('registros').getFullList<Registro>({
+    filter: `proximaAcao != '' && status != 'Concluída'`,
+    expand: EXPAND,
+    sort: 'dataProximaAcao',
+  })
+
+export const concluirPendencia = (id: string) => {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return pb
+    .collection('registros')
+    .update<Registro>(
+      id,
+      { status: 'Concluída', dataConclusao: `${y}-${m}-${d}` },
+      { expand: EXPAND },
+    )
+}
+
+export const reagendarPendencia = (id: string, dataProximaAcao: string) =>
+  pb.collection('registros').update<Registro>(id, { dataProximaAcao }, { expand: EXPAND })

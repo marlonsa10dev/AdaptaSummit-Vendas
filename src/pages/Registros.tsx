@@ -8,9 +8,17 @@ import {
   TrendingDown,
   CalendarClock,
   ClipboardList,
+  Check,
 } from 'lucide-react'
 import { useRealtime } from '@/hooks/use-realtime'
-import { getRegistros, deleteRegistro } from '@/services/registros'
+import {
+  getRegistros,
+  deleteRegistro,
+  concluirPendencia,
+  reagendarPendencia,
+} from '@/services/registros'
+import { getPendenciaStatus, hasPendencia } from '@/lib/pendencia'
+import { RescheduleDialog } from '@/components/RescheduleDialog'
 import { getClientes } from '@/services/clientes'
 import { RegistroForm } from '@/components/RegistroForm'
 import { Button } from '@/components/ui/button'
@@ -77,6 +85,8 @@ export default function Registros() {
   const [editingRegistro, setEditingRegistro] = useState<Registro | null>(null)
   const [deletingRegistro, setDeletingRegistro] = useState<Registro | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [rescheduleTarget, setRescheduleTarget] = useState<Registro | null>(null)
+  const [rescheduling, setRescheduling] = useState(false)
 
   const [clienteFilter, setClienteFilter] = useState('')
   const [tipoFilter, setTipoFilter] = useState('')
@@ -137,6 +147,39 @@ export default function Registros() {
       })
     } finally {
       setDeleting(false)
+    }
+  }
+
+  const handleConcluir = async (id: string) => {
+    try {
+      await concluirPendencia(id)
+      toast({ title: 'Pendência concluída', description: 'Ação marcada como concluída.' })
+      loadData()
+    } catch (err: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: err?.message || 'Erro ao concluir.',
+      })
+    }
+  }
+
+  const handleReagendar = async (newDate: string) => {
+    if (!rescheduleTarget) return
+    setRescheduling(true)
+    try {
+      await reagendarPendencia(rescheduleTarget.id, newDate)
+      toast({ title: 'Pendência reagendada', description: 'Nova data definida com sucesso.' })
+      setRescheduleTarget(null)
+      loadData()
+    } catch (err: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: err?.message || 'Erro ao reagendar.',
+      })
+    } finally {
+      setRescheduling(false)
     }
   }
 
@@ -234,6 +277,7 @@ export default function Registros() {
               {filteredRegistros.map((registro) => {
                 const meta = tipoMeta[registro.tipo] || tipoMeta['Highlight']
                 const Icon = meta.icon
+                const pStatus = hasPendencia(registro) ? getPendenciaStatus(registro) : null
                 return (
                   <div
                     key={registro.id}
@@ -247,12 +291,14 @@ export default function Registros() {
                           <Icon className="h-3 w-3" />
                           {registro.tipo}
                         </span>
-                        <Badge
-                          variant="outline"
-                          className={`text-[10px] px-1.5 py-0 ${registro.status === 'Concluída' ? 'text-emerald-600 border-emerald-200' : 'text-amber-600 border-amber-200'}`}
-                        >
-                          {registro.status || 'Pendente'}
-                        </Badge>
+                        {pStatus && (
+                          <Badge
+                            variant="outline"
+                            className={`text-[10px] px-1.5 py-0 ${pStatus === 'Concluída' ? 'text-emerald-600 border-emerald-200' : pStatus === 'Atrasada' ? 'text-rose-600 border-rose-200' : 'text-amber-600 border-amber-200'}`}
+                          >
+                            {pStatus}
+                          </Badge>
+                        )}
                       </div>
                       <span className="text-xs text-slate-400 whitespace-nowrap">
                         {new Date(getDatePart(registro.data) + 'T00:00:00').toLocaleDateString(
@@ -280,7 +326,27 @@ export default function Registros() {
                         </div>
                       </div>
                     )}
-                    <div className="flex justify-end gap-2">
+                    <div className="flex flex-wrap justify-end gap-2">
+                      {pStatus && pStatus !== 'Concluída' && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleConcluir(registro.id)}
+                            className="h-7 px-2 text-xs text-slate-600 hover:text-emerald-600 hover:bg-emerald-50"
+                          >
+                            <Check className="h-3 w-3 mr-1" /> Concluir
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setRescheduleTarget(registro)}
+                            className="h-7 px-2 text-xs text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                          >
+                            <CalendarClock className="h-3 w-3 mr-1" /> Reagendar
+                          </Button>
+                        </>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
@@ -317,6 +383,14 @@ export default function Registros() {
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs text-slate-600">
               Deseja realmente excluir este registro? Esta ação não pode ser desfeita.
+              {deletingRegistro &&
+                hasPendencia(deletingRegistro) &&
+                getPendenciaStatus(deletingRegistro) !== 'Concluída' && (
+                  <span className="block mt-2 text-rose-600 font-medium">
+                    ⚠️ Este registro possui uma pendência não concluída. Excluí-lo removerá a
+                    pendência permanentemente.
+                  </span>
+                )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -333,6 +407,14 @@ export default function Registros() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <RescheduleDialog
+        open={!!rescheduleTarget}
+        onOpenChange={(open) => !open && setRescheduleTarget(null)}
+        currentDate={getDatePart(rescheduleTarget?.dataProximaAcao || '')}
+        onConfirm={handleReagendar}
+        loading={rescheduling}
+      />
     </div>
   )
 }

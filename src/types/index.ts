@@ -34,6 +34,7 @@ export interface Registro {
   status: 'Pendente' | 'Concluída'
   responsavel: string
   atualizadoPor?: string
+  dataConclusao?: string
   expand?: {
     cliente?: Cliente
     responsavel?: User

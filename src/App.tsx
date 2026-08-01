@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Layout } from '@/components/Layout'
 import Login from '@/pages/Login'
 import Index from '@/pages/Index'
+import MinhaSemana from '@/pages/MinhaSemana'
 import Clientes from '@/pages/Clientes'
 import Registros from '@/pages/Registros'
 import NotFound from '@/pages/NotFound'
@@ -27,6 +28,7 @@ const App = () => (
             }
           >
             <Route path="/" element={<Index />} />
+            <Route path="/minha-semana" element={<MinhaSemana />} />
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/registros" element={<Registros />} />
           </Route>
