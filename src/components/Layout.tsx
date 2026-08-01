@@ -10,6 +10,8 @@ import {
   CalendarCheck,
   BarChart3,
   PieChart,
+  ShieldCheck,
+  History,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -17,6 +19,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
+
 
 export function Layout() {
   const { user, signOut } = useAuth()
@@ -31,6 +34,9 @@ export function Layout() {
 
   const isManager =
     user?.perfil === 'Gestor' || user?.perfil === 'Diretoria' || user?.perfil === 'Administrador'
+  const isAdmin = user?.perfil === 'Administrador'
+
+  const isAdmin = user?.perfil === 'Administrador'
 
   const navItems = [
     { label: 'Minha Semana', path: '/minha-semana', icon: CalendarCheck },
@@ -41,6 +47,40 @@ export function Layout() {
     ...(isManager ? [{ label: 'Visão de Gestão', path: '/visao-gestao', icon: PieChart }] : []),
   ]
 
+  const adminItems = [
+    { label: 'Gestão de Usuários', path: '/gestao-usuarios', icon: ShieldCheck },
+    { label: 'Trilha de Auditoria', path: '/trilha-auditoria', icon: ScrollText },
+  ]
+
+  const allNavItems = [...navItems, ...(isAdmin ? adminItems : [])]
+
+  const adminItems = [
+    { label: 'Gestão de Usuários', path: '/gestao-usuarios', icon: ShieldCheck },
+    { label: 'Trilha de Auditoria', path: '/auditoria', icon: History },
+  ]
+
+  const allNavPaths = [...navItems, ...(isAdmin ? adminItems : [])].map((i) => i.path)
+=======
+  const isManager =
+    user?.perfil === 'Gestor' || user?.perfil === 'Diretoria' || user?.perfil === 'Administrador'
+  const isAdmin = user?.perfil === 'Administrador'
+
+  const navItems = [
+    { label: 'Minha Semana', path: '/minha-semana', icon: CalendarCheck },
+    { label: 'Visão Geral', path: '/', icon: LayoutDashboard },
+    { label: 'Clientes', path: '/clientes', icon: Users },
+    { label: 'Registros', path: '/registros', icon: ClipboardList },
+    { label: 'Visão por Vendedor', path: '/visao-vendedor', icon: BarChart3 },
+    ...(isManager ? [{ label: 'Visão de Gestão', path: '/visao-gestao', icon: PieChart }] : []),
+  ]
+
+  const adminItems = [
+    { label: 'Gestão de Usuários', path: '/gestao-usuarios', icon: ShieldCheck },
+    { label: 'Trilha de Auditoria', path: '/auditoria', icon: History },
+  ]
+
+  const allNavPaths = [...navItems, ...(isAdmin ? adminItems : [])].map((i) => i.path)
+
   const userInitials = user?.name
     ? user.name
         .split(' ')
@@ -50,8 +90,9 @@ export function Layout() {
         .toUpperCase()
     : 'U'
 
+  const allItems = [...navItems, ...(isAdmin ? adminItems : [])]
   const activeTitle =
-    navItems.find((i) => i.path === location.pathname)?.label || 'Inteligência Comercial'
+    allItems.find((i) => i.path === location.pathname)?.label || 'Inteligência Comercial'
 
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -88,6 +129,34 @@ export function Layout() {
                 </Link>
               )
             })}
+            {isAdmin && (
+              <>
+                <div className="mt-3 px-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Administração
+                </div>
+                {adminItems.map((item) => {
+                  const Icon = item.icon
+                  const isActive = location.pathname === item.path
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        'flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium transition-all duration-150',
+                        isActive
+                          ? 'bg-purple-50 text-purple-600 shadow-sm font-semibold'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                      )}
+                    >
+                      <Icon
+                        className={cn('h-4 w-4', isActive ? 'text-purple-600' : 'text-slate-500')}
+                      />
+                      {item.label}
+                    </Link>
+                  )
+                })}
+              </>
+            )}
           </nav>
         </div>
 
@@ -164,6 +233,33 @@ export function Layout() {
                     </Link>
                   )
                 })}
+                {isAdmin && (
+                  <>
+                    <div className="mt-3 px-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Administração
+                    </div>
+                    {adminItems.map((item) => {
+                      const Icon = item.icon
+                      const isActive = location.pathname === item.path
+                      return (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setDrawerOpen(false)}
+                          className={cn(
+                            'flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium transition-colors',
+                            isActive
+                              ? 'bg-purple-50 text-purple-600 font-semibold'
+                              : 'text-slate-600 hover:bg-slate-100',
+                          )}
+                        >
+                          <Icon className="h-4 w-4" />
+                          {item.label}
+                        </Link>
+                      )
+                    })}
+                  </>
+                )}
               </nav>
 
               <div className="mt-auto border-t border-slate-100 pt-4">

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/hooks/use-auth'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { RoleGuard } from '@/components/RoleGuard'
 import { Layout } from '@/components/Layout'
 import Login from '@/pages/Login'
 import Index from '@/pages/Index'
@@ -10,10 +11,15 @@ import Registros from '@/pages/Registros'
 import FichaCliente from '@/pages/FichaCliente'
 import VisaoVendedor from '@/pages/VisaoVendedor'
 import VisaoGestao from '@/pages/VisaoGestao'
+import GestaoUsuarios from '@/pages/GestaoUsuarios'
+import Auditoria from '@/pages/Auditoria'
 import NotFound from '@/pages/NotFound'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import type { UserPerfil } from '@/types'
+
+const adminOnly: UserPerfil[] = ['Administrador']
 
 const App = () => (
   <BrowserRouter>
@@ -37,6 +43,22 @@ const App = () => (
             <Route path="/ficha-cliente/:clienteId" element={<FichaCliente />} />
             <Route path="/visao-vendedor" element={<VisaoVendedor />} />
             <Route path="/visao-gestao" element={<VisaoGestao />} />
+            <Route
+              path="/gestao-usuarios"
+              element={
+                <RoleGuard allowedProfiles={adminOnly}>
+                  <GestaoUsuarios />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/auditoria"
+              element={
+                <RoleGuard allowedProfiles={adminOnly}>
+                  <Auditoria />
+                </RoleGuard>
+              }
+            />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
