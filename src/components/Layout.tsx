@@ -20,7 +20,6 @@ import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 
-
 export function Layout() {
   const { user, signOut } = useAuth()
   const location = useLocation()
@@ -32,35 +31,6 @@ export function Layout() {
     navigate('/login')
   }
 
-  const isManager =
-    user?.perfil === 'Gestor' || user?.perfil === 'Diretoria' || user?.perfil === 'Administrador'
-  const isAdmin = user?.perfil === 'Administrador'
-
-  const isAdmin = user?.perfil === 'Administrador'
-
-  const navItems = [
-    { label: 'Minha Semana', path: '/minha-semana', icon: CalendarCheck },
-    { label: 'Visão Geral', path: '/', icon: LayoutDashboard },
-    { label: 'Clientes', path: '/clientes', icon: Users },
-    { label: 'Registros', path: '/registros', icon: ClipboardList },
-    { label: 'Visão por Vendedor', path: '/visao-vendedor', icon: BarChart3 },
-    ...(isManager ? [{ label: 'Visão de Gestão', path: '/visao-gestao', icon: PieChart }] : []),
-  ]
-
-  const adminItems = [
-    { label: 'Gestão de Usuários', path: '/gestao-usuarios', icon: ShieldCheck },
-    { label: 'Trilha de Auditoria', path: '/trilha-auditoria', icon: ScrollText },
-  ]
-
-  const allNavItems = [...navItems, ...(isAdmin ? adminItems : [])]
-
-  const adminItems = [
-    { label: 'Gestão de Usuários', path: '/gestao-usuarios', icon: ShieldCheck },
-    { label: 'Trilha de Auditoria', path: '/auditoria', icon: History },
-  ]
-
-  const allNavPaths = [...navItems, ...(isAdmin ? adminItems : [])].map((i) => i.path)
-=======
   const isManager =
     user?.perfil === 'Gestor' || user?.perfil === 'Diretoria' || user?.perfil === 'Administrador'
   const isAdmin = user?.perfil === 'Administrador'
