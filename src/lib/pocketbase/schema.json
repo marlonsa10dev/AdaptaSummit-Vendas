@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T19:00:45.452Z",
+  "generatedAt": "2026-08-01T19:14:18.747Z",
   "collections": [
     {
       "name": "users",
@@ -101,11 +101,11 @@
       "name": "registros",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
+        "list": "responsavel = @request.auth.id",
+        "view": "responsavel = @request.auth.id",
         "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != '' && @request.auth.perfil = 'Administrador'"
+        "update": "responsavel = @request.auth.id",
+        "delete": "responsavel = @request.auth.id"
       },
       "fields": [
         {
@@ -160,6 +160,26 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "dataProximaAcao",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Pendente", "Concluída"]
+        },
+        {
+          "name": "atualizadoPor",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
         }
       ],
       "indexes": [

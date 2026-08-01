@@ -1,6 +1,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Users, UserCheck, Activity, UserPlus, ArrowRight, Building2, Calendar } from 'lucide-react'
+import {
+  Users,
+  UserCheck,
+  Activity,
+  UserPlus,
+  ArrowRight,
+  Building2,
+  Calendar,
+  Plus,
+} from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
 import { getClientes } from '@/services/clientes'
@@ -72,13 +81,19 @@ export default function Index() {
           </div>
         </div>
 
-        <Button
-          onClick={() => navigate('/clientes')}
-          className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 font-semibold gap-2 self-start sm:self-auto"
-        >
-          <UserPlus className="h-4 w-4" />
-          Cadastrar cliente
-        </Button>
+        <div className="flex gap-2 self-start sm:self-auto">
+          <Button
+            onClick={() => navigate('/registros')}
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 font-semibold gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Novo registro
+          </Button>
+          <Button onClick={() => navigate('/clientes')} variant="outline" className="gap-2">
+            <UserPlus className="h-4 w-4" />
+            Clientes
+          </Button>
+        </div>
       </div>
 
       {/* Stat Cards */}

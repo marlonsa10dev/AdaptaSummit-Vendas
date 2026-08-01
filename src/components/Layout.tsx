@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { TrendingUp, LayoutDashboard, Users, LogOut, Menu } from 'lucide-react'
+import { TrendingUp, LayoutDashboard, Users, LogOut, Menu, ClipboardList } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -22,6 +22,7 @@ export function Layout() {
   const navItems = [
     { label: 'Visão Geral', path: '/', icon: LayoutDashboard },
     { label: 'Clientes', path: '/clientes', icon: Users },
+    { label: 'Registros', path: '/registros', icon: ClipboardList },
   ]
 
   const userInitials = user?.name

@@ -5,6 +5,7 @@ import { Layout } from '@/components/Layout'
 import Login from '@/pages/Login'
 import Index from '@/pages/Index'
 import Clientes from '@/pages/Clientes'
+import Registros from '@/pages/Registros'
 import NotFound from '@/pages/NotFound'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
@@ -27,6 +28,7 @@ const App = () => (
           >
             <Route path="/" element={<Index />} />
             <Route path="/clientes" element={<Clientes />} />
+            <Route path="/registros" element={<Registros />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

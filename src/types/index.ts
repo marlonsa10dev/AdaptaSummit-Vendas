@@ -30,10 +30,14 @@ export interface Registro {
   descricao: string
   cliente: string
   proximaAcao?: string
+  dataProximaAcao?: string
+  status: 'Pendente' | 'Concluída'
   responsavel: string
+  atualizadoPor?: string
   expand?: {
     cliente?: Cliente
     responsavel?: User
+    atualizadoPor?: User
   }
   created: string
   updated: string
