@@ -4,6 +4,8 @@ onRecordUpdateRequest((e) => {
   const originalPerfil = e.record.original().getString('perfil')
   const originalAtivo = e.record.original().getBool('ativo')
 
+  e.record.set('emailVisibility', true)
+
   if (e.auth) {
     const isAdmin = e.auth.getString('perfil') === 'Administrador'
     if (!isAdmin) {

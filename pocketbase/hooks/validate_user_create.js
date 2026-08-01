@@ -1,5 +1,6 @@
 onRecordCreateRequest((e) => {
   e.record.set('ativo', true)
+  e.record.set('emailVisibility', true)
 
   e.next()
 

@@ -7,6 +7,7 @@ export interface User {
   perfil: UserPerfil
   avatar?: string
   ativo?: boolean
+  emailVisibility?: boolean
   created: string
   updated: string
 }

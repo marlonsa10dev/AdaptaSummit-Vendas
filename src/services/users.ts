@@ -17,6 +17,7 @@ export const createUser = (data: {
     passwordConfirm: data.password,
     perfil: data.perfil,
     ativo: true,
+    emailVisibility: true,
   })
 
 export const updateUser = (
