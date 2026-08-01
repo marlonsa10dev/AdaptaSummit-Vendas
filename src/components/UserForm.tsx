@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { createUser, updateUser } from '@/services/users'
@@ -6,6 +6,7 @@ import { extractFieldErrors } from '@/lib/pocketbase/errors'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Select,
@@ -25,12 +26,22 @@ interface UserFormProps {
 export function UserForm({ editingUser, onSaved, onCancelEdit }: UserFormProps) {
   const { toast } = useToast()
 
-  const [name, setName] = useState(editingUser?.name || '')
-  const [email, setEmail] = useState(editingUser?.email || '')
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [perfil, setPerfil] = useState(editingUser?.perfil || '')
+  const [perfil, setPerfil] = useState('')
+  const [ativo, setAtivo] = useState(true)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    setName(editingUser?.name || '')
+    setEmail(editingUser?.email || '')
+    setPassword('')
+    setPerfil(editingUser?.perfil || '')
+    setAtivo(editingUser?.ativo !== false)
+    setErrors({})
+  }, [editingUser])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,10 +61,17 @@ export function UserForm({ editingUser, onSaved, onCancelEdit }: UserFormProps) 
     setSaving(true)
     try {
       if (editingUser) {
-        const payload: { name: string; email: string; perfil: string; password?: string } = {
+        const payload: {
+          name: string
+          email: string
+          perfil: string
+          ativo: boolean
+          password?: string
+        } = {
           name: name.trim(),
           email: email.trim(),
           perfil,
+          ativo,
         }
         if (password) payload.password = password
         await updateUser(editingUser.id, payload)
@@ -85,14 +103,29 @@ export function UserForm({ editingUser, onSaved, onCancelEdit }: UserFormProps) 
   }
 
   const resetFieldError = (field: string) => {
-    setErrors((prev) => ({ ...prev, [field]: '' }))
+    setErrors((prev) => {
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
   }
 
   return (
     <Card className="border-blue-100 bg-white shadow-sm">
       <CardHeader className="pb-3 border-b border-slate-100">
         <CardTitle className="text-base font-bold text-slate-900 flex items-center justify-between">
-          <span>{editingUser ? 'Editar usuário' : 'Novo usuário'}</span>
+          <span>
+            {editingUser ? (
+              <>
+                Editar usuário
+                <span className="ml-2 text-slate-400 font-normal text-sm">
+                  ({editingUser.name})
+                </span>
+              </>
+            ) : (
+              'Novo usuário'
+            )}
+          </span>
           {editingUser && (
             <Button
               variant="ghost"
@@ -187,6 +220,24 @@ export function UserForm({ editingUser, onSaved, onCancelEdit }: UserFormProps) 
               )}
             </div>
           </div>
+          {editingUser && (
+            <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3">
+              <div className="flex flex-col gap-0.5">
+                <Label className="text-xs font-semibold text-slate-700">Status do usuário</Label>
+                <span className="text-[11px] text-slate-500">
+                  Usuários inativos não podem fazer login no sistema
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-xs font-medium ${ativo ? 'text-emerald-600' : 'text-rose-500'}`}
+                >
+                  {ativo ? 'Ativo' : 'Inativo'}
+                </span>
+                <Switch checked={ativo} onCheckedChange={setAtivo} />
+              </div>
+            </div>
+          )}
           <div className="flex justify-end gap-2 pt-2">
             {editingUser && (
               <Button type="button" variant="outline" onClick={onCancelEdit} className="text-xs">
