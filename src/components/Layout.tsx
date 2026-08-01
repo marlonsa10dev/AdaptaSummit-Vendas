@@ -8,6 +8,8 @@ import {
   Menu,
   ClipboardList,
   CalendarCheck,
+  BarChart3,
+  PieChart,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -27,11 +29,16 @@ export function Layout() {
     navigate('/login')
   }
 
+  const isManager =
+    user?.perfil === 'Gestor' || user?.perfil === 'Diretoria' || user?.perfil === 'Administrador'
+
   const navItems = [
     { label: 'Minha Semana', path: '/minha-semana', icon: CalendarCheck },
     { label: 'Visão Geral', path: '/', icon: LayoutDashboard },
     { label: 'Clientes', path: '/clientes', icon: Users },
     { label: 'Registros', path: '/registros', icon: ClipboardList },
+    { label: 'Visão por Vendedor', path: '/visao-vendedor', icon: BarChart3 },
+    ...(isManager ? [{ label: 'Visão de Gestão', path: '/visao-gestao', icon: PieChart }] : []),
   ]
 
   const userInitials = user?.name

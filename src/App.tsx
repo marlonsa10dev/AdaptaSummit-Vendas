@@ -7,6 +7,9 @@ import Index from '@/pages/Index'
 import MinhaSemana from '@/pages/MinhaSemana'
 import Clientes from '@/pages/Clientes'
 import Registros from '@/pages/Registros'
+import FichaCliente from '@/pages/FichaCliente'
+import VisaoVendedor from '@/pages/VisaoVendedor'
+import VisaoGestao from '@/pages/VisaoGestao'
 import NotFound from '@/pages/NotFound'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
@@ -31,6 +34,9 @@ const App = () => (
             <Route path="/minha-semana" element={<MinhaSemana />} />
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/registros" element={<Registros />} />
+            <Route path="/ficha-cliente/:clienteId" element={<FichaCliente />} />
+            <Route path="/visao-vendedor" element={<VisaoVendedor />} />
+            <Route path="/visao-gestao" element={<VisaoGestao />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,5 +1,16 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { Search, Pencil, Trash2, AlertTriangle, Plus, X, Loader2, Building2 } from 'lucide-react'
+import {
+  Search,
+  Pencil,
+  Trash2,
+  AlertTriangle,
+  Plus,
+  X,
+  Loader2,
+  Building2,
+  FileText,
+} from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
 import { getClientes, createCliente, updateCliente, deleteCliente } from '@/services/clientes'
@@ -437,6 +448,18 @@ export default function Clientes() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            asChild
+                            className="h-8 px-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                            title="Ver ficha do cliente"
+                          >
+                            <Link to={`/ficha-cliente/${cliente.id}`}>
+                              <FileText className="h-3.5 w-3.5 mr-1" />
+                              Ver ficha
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleEdit(cliente)}
                             className="h-8 px-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50"
                             title="Editar cliente"
@@ -494,6 +517,17 @@ export default function Clientes() {
                     </p>
 
                     <div className="flex justify-end gap-2 pt-1 border-t border-slate-50">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="h-7 text-xs text-slate-700"
+                      >
+                        <Link to={`/ficha-cliente/${cliente.id}`}>
+                          <FileText className="h-3 w-3 mr-1" />
+                          Ficha
+                        </Link>
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
