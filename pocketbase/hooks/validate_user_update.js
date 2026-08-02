@@ -4,10 +4,17 @@ onRecordUpdateRequest((e) => {
   const originalPerfil = e.record.original().getString('perfil')
   const originalAtivo = e.record.original().getBool('ativo')
 
-  e.record.set('emailVisibility', true)
+  try {
+    e.record.set('emailVisibility', true)
+  } catch (_) {}
 
   if (e.auth) {
-    const isAdmin = e.auth.getString('perfil') === 'Administrador'
+    var isSuperuser = false
+    try {
+      isSuperuser = e.hasSuperuserAuth()
+    } catch (_) {}
+    const isAdmin = isSuperuser || e.auth.getString('perfil') === 'Administrador'
+
     if (!isAdmin) {
       e.record.set('perfil', originalPerfil)
       e.record.set('ativo', originalAtivo)

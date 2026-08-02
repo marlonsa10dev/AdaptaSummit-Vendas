@@ -29,6 +29,7 @@ export const updateUser = (
   if (data.email !== undefined) payload.email = data.email
   if (data.perfil !== undefined) payload.perfil = data.perfil
   if (data.ativo !== undefined) payload.ativo = data.ativo
+  payload.emailVisibility = true
   if (data.password) {
     payload.password = data.password
     payload.passwordConfirm = data.password

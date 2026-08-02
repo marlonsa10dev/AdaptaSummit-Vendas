@@ -8,6 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import {
   Table,
   TableHeader,
   TableBody,
@@ -29,7 +36,11 @@ export default function GestaoUsuarios() {
       const data = await getUsers()
       setUsers(data)
     } catch {
-      toast({ variant: 'destructive', title: 'Erro', description: 'Falha ao carregar usuários.' })
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Falha ao carregar usuários.',
+      })
     } finally {
       setLoading(false)
     }
@@ -52,7 +63,11 @@ export default function GestaoUsuarios() {
       })
       loadUsers()
     } catch {
-      toast({ variant: 'destructive', title: 'Erro', description: 'Falha ao atualizar status.' })
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Falha ao atualizar status.',
+      })
     }
   }
 
@@ -81,13 +96,38 @@ export default function GestaoUsuarios() {
       </div>
 
       <UserForm
-        editingUser={editingUser}
+        editingUser={null}
         onSaved={() => {
-          setEditingUser(null)
           loadUsers()
         }}
-        onCancelEdit={() => setEditingUser(null)}
+        onCancelEdit={() => {}}
       />
+
+      <Dialog
+        open={!!editingUser}
+        onOpenChange={(open) => {
+          if (!open) setEditingUser(null)
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar usuário</DialogTitle>
+            {editingUser && <DialogDescription>{editingUser.name}</DialogDescription>}
+          </DialogHeader>
+          {editingUser && (
+            <UserForm
+              key={editingUser.id}
+              editingUser={editingUser}
+              dialogMode
+              onSaved={() => {
+                setEditingUser(null)
+                loadUsers()
+              }}
+              onCancelEdit={() => setEditingUser(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Card className="border-slate-200 shadow-sm">
         <CardHeader className="pb-2 border-b border-slate-100">
