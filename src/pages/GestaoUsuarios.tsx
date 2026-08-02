@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Pencil, Power } from 'lucide-react'
-import { getUsers, updateUser } from '@/services/users'
+import { Pencil, Power, Trash2, Building2 } from 'lucide-react'
+import { getUsers, updateUser, deleteUser } from '@/services/users'
+import { getRelatorioData } from '@/services/relatorios'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/hooks/use-auth'
 import { UserForm } from '@/components/UserForm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -15,6 +17,16 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   Table,
   TableHeader,
   TableBody,
@@ -23,51 +35,92 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import type { User } from '@/types'
+import type { User, Cliente } from '@/types'
 
 export default function GestaoUsuarios() {
   const { toast } = useToast()
+  const { user: currentUser } = useAuth()
   const [users, setUsers] = useState<User[]>([])
+  const [clientes, setClientes] = useState<Cliente[]>([])
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [viewingUserClients, setViewingUserClients] = useState<User | null>(null)
 
-  const loadUsers = useCallback(async () => {
+  const isAdmin = currentUser?.perfil === 'Administrador'
+
+  const loadData = useCallback(async () => {
     try {
-      const data = await getUsers()
-      setUsers(data)
+      if (isAdmin) {
+        const [userData, relatorio] = await Promise.all([getUsers(), getRelatorioData()])
+        setUsers(userData)
+        setClientes(relatorio.clientes)
+      } else {
+        const relatorio = await getRelatorioData()
+        setUsers(relatorio.users)
+        setClientes(relatorio.clientes)
+      }
     } catch {
-      toast({
-        variant: 'destructive',
-        title: 'Erro',
-        description: 'Falha ao carregar usuários.',
-      })
+      toast({ variant: 'destructive', title: 'Erro', description: 'Falha ao carregar usuários.' })
     } finally {
       setLoading(false)
     }
-  }, [toast])
+  }, [toast, isAdmin])
 
   useEffect(() => {
-    loadUsers()
-  }, [loadUsers])
-
+    loadData()
+  }, [loadData])
   useRealtime('users', () => {
-    loadUsers()
+    loadData()
+  })
+  useRealtime('clientes', () => {
+    loadData()
   })
 
   const handleToggleAtivo = async (user: User) => {
     try {
       await updateUser(user.id, { ativo: !user.ativo })
-      toast({
-        title: 'Sucesso',
-        description: `Usuário ${!user.ativo ? 'ativado' : 'desativado'}.`,
-      })
-      loadUsers()
+      toast({ title: 'Sucesso', description: `Usuário ${!user.ativo ? 'ativado' : 'desativado'}.` })
+      loadData()
     } catch {
+      toast({ variant: 'destructive', title: 'Erro', description: 'Falha ao atualizar status.' })
+    }
+  }
+
+  const handleDeleteClick = (user: User) => {
+    if (currentUser && user.id === currentUser.id) {
       toast({
         variant: 'destructive',
-        title: 'Erro',
-        description: 'Falha ao atualizar status.',
+        title: 'Ação bloqueada',
+        description: 'Você não pode excluir o seu próprio usuário.',
       })
+      return
+    }
+    setDeleteError(null)
+    setUserToDelete(user)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return
+    setIsDeleting(true)
+    try {
+      await deleteUser(userToDelete.id)
+      toast({ title: 'Sucesso', description: 'Usuário excluído com sucesso.' })
+      setUserToDelete(null)
+      loadData()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : ''
+      if (msg.includes('próprio usuário')) {
+        setDeleteError('Você não pode excluir o seu próprio usuário.')
+      } else {
+        setDeleteError(
+          'Não foi possível excluir o usuário. Verifique se não há dados vinculados e tente novamente.',
+        )
+      }
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -86,6 +139,10 @@ export default function GestaoUsuarios() {
     Vendedor: 'bg-slate-100 text-slate-700',
   }
 
+  const getClienteCount = (userId: string) => clientes.filter((c) => c.vendedor === userId).length
+  const getClientNames = (userId: string) =>
+    clientes.filter((c) => c.vendedor === userId).map((c) => c.nome)
+
   return (
     <div className="space-y-6">
       <div className="border-b border-slate-200 pb-5">
@@ -95,13 +152,15 @@ export default function GestaoUsuarios() {
         <p className="text-sm text-slate-500 mt-1">Cadastre e gerencie usuários do sistema</p>
       </div>
 
-      <UserForm
-        editingUser={null}
-        onSaved={() => {
-          loadUsers()
-        }}
-        onCancelEdit={() => {}}
-      />
+      {isAdmin && (
+        <UserForm
+          editingUser={null}
+          onSaved={() => {
+            loadData()
+          }}
+          onCancelEdit={() => {}}
+        />
+      )}
 
       <Dialog
         open={!!editingUser}
@@ -121,7 +180,7 @@ export default function GestaoUsuarios() {
               dialogMode
               onSaved={() => {
                 setEditingUser(null)
-                loadUsers()
+                loadData()
               }}
               onCancelEdit={() => setEditingUser(null)}
             />
@@ -146,6 +205,7 @@ export default function GestaoUsuarios() {
                     <TableHead className="text-xs">Nome</TableHead>
                     <TableHead className="text-xs">E-mail</TableHead>
                     <TableHead className="text-xs">Perfil</TableHead>
+                    <TableHead className="text-xs text-center">Clientes</TableHead>
                     <TableHead className="text-xs text-center">Status</TableHead>
                     <TableHead className="text-xs text-center">Ações</TableHead>
                   </TableRow>
@@ -173,6 +233,18 @@ export default function GestaoUsuarios() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-slate-600 hover:text-blue-600 hover:bg-blue-50 gap-1"
+                          onClick={() => setViewingUserClients(u)}
+                          title="Ver clientes atribuídos"
+                        >
+                          <Building2 className="h-3 w-3" />
+                          {getClienteCount(u.id)}
+                        </Button>
+                      </TableCell>
+                      <TableCell className="text-center">
                         <Badge
                           variant={u.ativo === false ? 'destructive' : 'secondary'}
                           className="text-[10px]"
@@ -182,24 +254,37 @@ export default function GestaoUsuarios() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => setEditingUser(u)}
-                            title="Editar"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => handleToggleAtivo(u)}
-                            title={u.ativo === false ? 'Ativar' : 'Desativar'}
-                          >
-                            <Power className="h-3.5 w-3.5" />
-                          </Button>
+                          {isAdmin && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setEditingUser(u)}
+                                title="Editar"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleToggleAtivo(u)}
+                                title={u.ativo === false ? 'Ativar' : 'Desativar'}
+                              >
+                                <Power className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => handleDeleteClick(u)}
+                                title="Excluir"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -210,6 +295,80 @@ export default function GestaoUsuarios() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog
+        open={!!userToDelete}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) {
+            setUserToDelete(null)
+            setDeleteError(null)
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir usuário</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir permanentemente o usuário{' '}
+              <strong>{userToDelete?.name}</strong>? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {deleteError && <p className="text-sm font-medium text-red-600">{deleteError}</p>}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                handleConfirmDelete()
+              }}
+              disabled={isDeleting}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              {isDeleting ? 'Excluindo...' : 'Excluir permanentemente'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog
+        open={!!viewingUserClients}
+        onOpenChange={(open) => {
+          if (!open) setViewingUserClients(null)
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-slate-500" />
+              Clientes de {viewingUserClients?.name}
+            </DialogTitle>
+            <DialogDescription>
+              {getClienteCount(viewingUserClients?.id || '')} cliente(s) atribuído(s) a este
+              vendedor.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-72 overflow-y-auto">
+            {getClienteCount(viewingUserClients?.id || '') === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <Building2 className="h-8 w-8 text-slate-300 mb-2" />
+                <p className="text-sm font-medium text-slate-700">Nenhum cliente atribuído</p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Este vendedor ainda não possui clientes vinculados.
+                </p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {getClientNames(viewingUserClients?.id || '').map((nome, i) => (
+                  <li key={i} className="flex items-center gap-2 py-2 text-sm text-slate-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+                    {nome}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import pb from '@/lib/pocketbase/client'
 import type { Registro } from '@/types'
 
-const EXPAND = 'cliente,responsavel,atualizadoPor'
+const EXPAND = 'cliente,responsavel,atualizadoPor,cliente.vendedor'
 
 export const getRegistros = () =>
   pb.collection('registros').getFullList<Registro>({ expand: EXPAND, sort: '-data' })

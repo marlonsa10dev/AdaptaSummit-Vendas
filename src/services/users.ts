@@ -36,3 +36,5 @@ export const updateUser = (
   }
   return pb.collection('users').update<User>(id, payload)
 }
+
+export const deleteUser = (id: string) => pb.send(`/backend/v1/users/${id}`, { method: 'DELETE' })

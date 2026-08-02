@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T02:32:19.965Z",
+  "generatedAt": "2026-08-02T03:05:29.636Z",
   "collections": [
     {
       "name": "users",
@@ -78,7 +78,7 @@
         {
           "name": "vendedor",
           "type": "relation",
-          "required": true,
+          "required": false,
           "system": false,
           "collectionRef": "users"
         },
@@ -149,7 +149,7 @@
         {
           "name": "responsavel",
           "type": "relation",
-          "required": true,
+          "required": false,
           "system": false,
           "collectionRef": "users"
         },
@@ -216,7 +216,7 @@
         {
           "name": "usuario",
           "type": "relation",
-          "required": true,
+          "required": false,
           "system": false,
           "collectionRef": "users"
         },

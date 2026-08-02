@@ -171,9 +171,14 @@ export default function VisaoGestao() {
             <div className="divide-y divide-slate-100">
               {lowlightRanking.map((item, i) => (
                 <div key={i} className="flex items-center justify-between px-4 py-2.5">
-                  <span className="text-sm font-medium text-slate-700">
-                    {i + 1}. {item.clienteNome}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-slate-700">
+                      {i + 1}. {item.clienteNome}
+                    </span>
+                    <span className="text-[11px] text-slate-400">
+                      Vendedor: {item.vendedorNome}
+                    </span>
+                  </div>
                   <span className="text-sm font-bold text-rose-600">{item.count}</span>
                 </div>
               ))}

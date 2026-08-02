@@ -21,6 +21,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import type { UserPerfil } from '@/types'
 
 const adminOnly: UserPerfil[] = ['Administrador']
+const adminAndDiretoria: UserPerfil[] = ['Administrador', 'Diretoria']
 
 const App = () => (
   <BrowserRouter>
@@ -48,7 +49,7 @@ const App = () => (
             <Route
               path="/gestao-usuarios"
               element={
-                <RoleGuard allowedProfiles={adminOnly}>
+                <RoleGuard allowedProfiles={adminAndDiretoria}>
                   <GestaoUsuarios />
                 </RoleGuard>
               }

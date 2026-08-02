@@ -308,6 +308,10 @@ export default function Registros() {
                     </div>
                     <p className="text-sm font-semibold text-slate-900 mb-1">
                       {registro.expand?.cliente?.nome || 'Cliente não informado'}
+                      <span className="ml-2 text-xs font-normal text-slate-400">
+                        · Vendedor:{' '}
+                        {registro.expand?.cliente?.expand?.vendedor?.name || 'Não atribuído'}
+                      </span>
                     </p>
                     <p className="text-sm text-slate-600 mb-2">{registro.descricao}</p>
                     {registro.proximaAcao && (

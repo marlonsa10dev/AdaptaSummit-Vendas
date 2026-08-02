@@ -43,13 +43,18 @@ export function getPortfolioCoverage(
 }
 
 export function getLowlightRanking(registros: Registro[], limit = 10) {
-  const map = new Map<string, number>()
+  const map = new Map<string, { clienteNome: string; count: number; vendedorNome: string }>()
   for (const r of registros.filter((r) => r.tipo === 'Lowlight')) {
     const nome = r.expand?.cliente?.nome || 'Desconhecido'
-    map.set(nome, (map.get(nome) || 0) + 1)
+    const vendedorNome = r.expand?.cliente?.expand?.vendedor?.name || 'Não atribuído'
+    const existing = map.get(nome)
+    if (existing) {
+      existing.count++
+    } else {
+      map.set(nome, { clienteNome: nome, count: 1, vendedorNome })
+    }
   }
-  return Array.from(map.entries())
-    .map(([clienteNome, count]) => ({ clienteNome, count }))
+  return Array.from(map.values())
     .sort((a, b) => b.count - a.count)
     .slice(0, limit)
 }

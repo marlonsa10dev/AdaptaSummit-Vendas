@@ -65,6 +65,7 @@ export default function FichaCliente() {
         { key: 'tipo', label: 'Tipo' },
         { key: 'descricao', label: 'Descrição' },
         { key: 'responsavel', label: 'Responsável' },
+        { key: 'vendedor', label: 'Vendedor' },
         { key: 'proximaAcao', label: 'Próxima Ação' },
         { key: 'status', label: 'Status' },
       ],
@@ -73,6 +74,7 @@ export default function FichaCliente() {
         tipo: r.tipo,
         descricao: r.descricao,
         responsavel: r.expand?.responsavel?.name || '',
+        vendedor: cliente.expand?.vendedor?.name || 'Não atribuído',
         proximaAcao: r.proximaAcao || '',
         status: hasPendencia(r) ? getPendenciaStatus(r) : '',
       })),
@@ -100,7 +102,10 @@ export default function FichaCliente() {
               {cliente.nome}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Ficha da Conta · {registros.length} registros
+              Ficha da Conta · {registros.length} registros · Vendedor:{' '}
+              <span className="font-medium text-slate-700">
+                {cliente.expand?.vendedor?.name || 'Não atribuído'}
+              </span>
             </p>
           </div>
         </div>
